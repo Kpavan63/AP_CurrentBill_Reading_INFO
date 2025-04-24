@@ -19,12 +19,7 @@ A modern, responsive web application for calculating electricity bills with an i
 
 ## Demo
 
-Live Demo: [Smart Energy Calculator](https://your-demo-url.com)
-
-
-## Support
-
-For support, email your-email@example.com or create an issue in the repository.
+Live Demo: [Smart Energy Calculator](https://kpavan63.github.io/AP_CurrentBill_Reading_INFO/)
 
 ## Authors
 
