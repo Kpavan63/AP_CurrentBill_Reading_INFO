@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electricity Bill Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #f2f2f2;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      padding: 30px 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      max-width: 460px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin: 15px 0 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .add-btn {
+      background-color: #4caf50;
+      color: white;
+      margin-top: 5px;
+      width: 100%;
+    }
+
+    .edit-btn {
+      background-color: #f44336;
+      color: white;
+      margin-left: 10px;
+    }
+
+    .calc-btn {
+      width: 100%;
+      background-color: #2196f3;
+      color: white;
+      margin-top: 10px;
+    }
+
+    .calc-btn:hover {
+      background-color: #1976d2;
+    }
+
+    .card {
+      background-color: #e8f5e9;
+      border-left: 5px solid #4caf50;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result {
+      margin-top: 20px;
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      color: #0d47a1;
+      font-weight: bold;
+    }
+
+    .tips {
+      margin-top: 10px;
+      background-color: #fffde7;
+      padding: 12px;
+      border-left: 4px solid #ffc107;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #795548;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Electricity Bill Calculator ⚡</h2>
+
+  <label for="prev">Previous Reading (kWh)</label>
+  <input type="number" id="prev" placeholder="e.g. 12935" />
+
+  <label for="curr">Current Reading (kWh)</label>
+  <input type="number" id="curr" placeholder="e.g. 13040" />
+
+  <div id="unitInputSection">
+    <label for="unitCost">Enter Unit Cost (₹)</label>
+    <input type="number" id="unitCost" placeholder="e.g. 5.61" step="0.01" />
+    <button class="btn add-btn" onclick="addUnitCost()">Add Unit Cost</button>
+  </div>
+
+  <div id="unitCardSection" style="display: none;">
+    <div class="card">
+      <div>📌 Unit Cost: <strong>₹<span id="unitDisplay"></span></strong></div>
+      <button class="btn edit-btn" onclick="removeUnitCost()">Remove</button>
+    </div>
+  </div>
+
+  <button class="btn calc-btn" onclick="calculateBill()">Calculate Bill</button>
+
+  <div class="result" id="result" style="display:none;"></div>
+  <div class="tips" id="tips" style="display:none;"></div>
+</div>
+
+<script>
+  let savedUnitCost = null;
+
+  window.onload = () => {
+    const stored = localStorage.getItem("unitCost");
+    if (stored) {
+      savedUnitCost = parseFloat(stored);
+      document.getElementById("unitDisplay").innerText = savedUnitCost.toFixed(2);
+      document.getElementById("unitInputSection").style.display = "none";
+      document.getElementById("unitCardSection").style.display = "block";
+    }
+  };
+
+  function addUnitCost() {
+    const unitValue = parseFloat(document.getElementById("unitCost").value);
+    if (isNaN(unitValue) || unitValue <= 0) {
+      alert("Please enter a valid cost per unit.");
+      return;
+    }
+
+    savedUnitCost = unitValue;
+    localStorage.setItem("unitCost", unitValue);
+    document.getElementById("unitDisplay").innerText = unitValue.toFixed(2);
+    document.getElementById("unitInputSection").style.display = "none";
+    document.getElementById("unitCardSection").style.display = "block";
+  }
+
+  function removeUnitCost() {
+    savedUnitCost = null;
+    localStorage.removeItem("unitCost");
+    document.getElementById("unitCost").value = '';
+    document.getElementById("unitInputSection").style.display = "block";
+    document.getElementById("unitCardSection").style.display = "none";
+    document.getElementById("result").style.display = "none";
+    document.getElementById("tips").style.display = "none";
+  }
+
+  function calculateBill() {
+    const prev = parseFloat(document.getElementById("prev").value);
+    const curr = parseFloat(document.getElementById("curr").value);
+
+    if (isNaN(prev) || isNaN(curr) || curr < prev) {
+      alert("Please enter valid meter readings.");
+      return;
+    }
+
+    if (savedUnitCost === null) {
+      alert("Please add the unit cost first.");
+      return;
+    }
+
+    const units = curr - prev;
+    const amount = units * savedUnitCost;
+
+    const result = `
+      🔌 Units Consumed: <strong>${units} kWh</strong><br>
+      💰 Total Amount: <strong>₹${amount.toFixed(2)}</strong>
+    `;
+    document.getElementById("result").innerHTML = result;
+    document.getElementById("result").style.display = "block";
+
+    // Show energy-saving tips
+    let tipText = "";
+    if (amount > 1000) {
+      tipText = "💡 Your bill is a bit high! Try using LED lights, turning off unused devices, and checking for energy leaks.";
+    } else if (amount > 500) {
+      tipText = "🔋 Consider reducing heavy appliance usage or using them in non-peak hours.";
+    } else {
+      tipText = "✅ Great job keeping your energy usage in check!";
+    }
+
+    const tipsBox = document.getElementById("tips");
+    tipsBox.innerText = tipText;
+    tipsBox.style.display = "block";
+  }
+</script>
+
+</body>
+</html>
