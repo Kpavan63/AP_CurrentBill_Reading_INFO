@@ -1,229 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Electricity Bill Calculator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Energy Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f0c29;
+      background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+      background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+      z-index: -1;
     }
 
     body {
-      background: #f2f2f2;
       margin: 0;
-      padding: 40px 20px;
+      padding: 20px;
+      min-height: 100vh;
       display: flex;
+      align-items: center;
       justify-content: center;
+      position: relative;
     }
 
-    .container {
-      background: white;
-      padding: 30px 25px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      max-width: 460px;
+    .clear-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      font-size: 14px;
+      z-index: 100;
+    }
+
+    .clear-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .wrapper {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      overflow: hidden;
       width: 100%;
+      max-width: 550px;
+      transform: translateY(0);
+      transition: transform 0.3s ease;
+      z-index: 10;
     }
 
-    h2 {
+    .header {
+      padding: 25px 30px;
+      color: white;
       text-align: center;
-      margin-bottom: 20px;
-      color: #333;
     }
 
-    label {
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+
+    .meta-info {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .designer-credit {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 10px;
+    }
+
+    .tab-header {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab-header div {
+      flex: 1;
+      text-align: center;
+      padding: 16px 0;
+      cursor: pointer;
       font-weight: 500;
-      display: block;
-      margin: 15px 0 5px;
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab-header div.active {
+      color: white;
+    }
+
+    .tab-header div.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: white;
+    }
+
+    .tab-content {
+      padding: 30px;
+      color: white;
+    }
+
+    .stored-rate {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 15px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .rate-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .rate-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 14px;
+    }
+
+    .add-rate-btn {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .add-rate-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
     }
 
     input {
       width: 100%;
-      padding: 10px;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 14px;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
     }
 
     .btn {
-      padding: 10px 16px;
+      width: 100%;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.2);
       border: none;
       border-radius: 8px;
-      font-weight: bold;
+      color: white;
+      font-size: 15px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: all 0.3s ease;
     }
 
-    .add-btn {
-      background-color: #4caf50;
-      color: white;
-      margin-top: 5px;
-      width: 100%;
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
     }
 
-    .edit-btn {
-      background-color: #f44336;
-      color: white;
-      margin-left: 10px;
-    }
-
-    .calc-btn {
-      width: 100%;
-      background-color: #2196f3;
-      color: white;
-      margin-top: 10px;
-    }
-
-    .calc-btn:hover {
-      background-color: #1976d2;
-    }
-
-    .card {
-      background-color: #e8f5e9;
-      border-left: 5px solid #4caf50;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .result {
+    .result-box {
       margin-top: 20px;
-      background: #e3f2fd;
-      padding: 15px;
-      border-radius: 10px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
       text-align: center;
-      color: #0d47a1;
-      font-weight: bold;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: none;
     }
 
     .tips {
-      margin-top: 10px;
-      background-color: #fffde7;
-      padding: 12px;
-      border-left: 4px solid #ffc107;
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       font-size: 14px;
-      color: #795548;
+      line-height: 1.5;
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 600px) {
-      .container {
-        padding: 20px;
-      }
+      body { padding: 15px; }
+      .wrapper { margin: 10px; }
+      .rate-input-group { flex-direction: column; }
+      .add-rate-btn { width: 100%; }
+      .header h1 { font-size: 20px; }
+      .tab-content { padding: 20px; }
     }
   </style>
 </head>
 <body>
+  <div id="particles-js"></div>
+  <button class="clear-btn" onclick="clearStoredData()">Reset</button>
+  <div class="wrapper">
+    <div class="header">
+      <h1>Smart Energy Calculator</h1>
+      <p>Calculate your electricity consumption easily</p>
+      <div class="meta-info">
+        Last Updated: <span id="timestamp">2025-04-24 17:22:10</span>
+    
+      </div>
+      <div class="designer-credit">Designed by TLF</div>
+    </div>
 
-<div class="container">
-  <h2>Electricity Bill Calculator ⚡</h2>
+    <div class="tab-header">
+      <div id="readingTab" class="active" onclick="switchTab('reading')">Meter Reading</div>
+      <div id="unitTab" onclick="switchTab('units')">Direct Units</div>
+    </div>
 
-  <label for="prev">Previous Reading (kWh)</label>
-  <input type="number" id="prev" placeholder="e.g. 12935" />
+    <div class="tab-content" id="readingContent">
+      <div class="stored-rate" id="storedRate1"></div>
+      <div class="rate-input-group" id="rateInputGroup1">
+        <input type="number" class="rate-input" id="newRate1" placeholder="Enter rate per unit" step="0.01">
+        <button class="add-rate-btn" onclick="addRate('1')">Add Rate</button>
+      </div>
+      <div class="input-group">
+        <label>Previous Reading (kWh)</label>
+        <input type="number" id="prevReading" placeholder="Enter previous reading">
+      </div>
+      <div class="input-group">
+        <label>Current Reading (kWh)</label>
+        <input type="number" id="currReading" placeholder="Enter current reading">
+      </div>
+      <button class="btn" onclick="calculateFromReadings()">Calculate Bill</button>
+      <div id="resultReading" class="result-box"></div>
+      <div id="tipReading" class="tips"></div>
+    </div>
 
-  <label for="curr">Current Reading (kWh)</label>
-  <input type="number" id="curr" placeholder="e.g. 13040" />
-
-  <div id="unitInputSection">
-    <label for="unitCost">Enter Unit Cost (₹)</label>
-    <input type="number" id="unitCost" placeholder="e.g. 5.61" step="0.01" />
-    <button class="btn add-btn" onclick="addUnitCost()">Add Unit Cost</button>
-  </div>
-
-  <div id="unitCardSection" style="display: none;">
-    <div class="card">
-      <div>📌 Unit Cost: <strong>₹<span id="unitDisplay"></span></strong></div>
-      <button class="btn edit-btn" onclick="removeUnitCost()">Remove</button>
+    <div class="tab-content" id="unitContent" style="display: none;">
+      <div class="stored-rate" id="storedRate2"></div>
+      <div class="rate-input-group" id="rateInputGroup2">
+        <input type="number" class="rate-input" id="newRate2" placeholder="Enter rate per unit" step="0.01">
+        <button class="add-rate-btn" onclick="addRate('2')">Add Rate</button>
+      </div>
+      <div class="input-group">
+        <label>Units Consumed (kWh)</label>
+        <input type="number" id="units" placeholder="Enter units consumed">
+      </div>
+      <button class="btn" onclick="calculateFromUnits()">Calculate Bill</button>
+      <div id="resultUnits" class="result-box"></div>
+      <div id="tipUnits" class="tips"></div>
     </div>
   </div>
 
-  <button class="btn calc-btn" onclick="calculateBill()">Calculate Bill</button>
+  <script>
+    // Particles.js configuration
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: {
+          value: 0.5,
+          random: false,
+          animation: { enable: true, speed: 1, minimumValue: 0.1, sync: false }
+        },
+        size: {
+          value: 3,
+          random: true,
+          animation: { enable: true, speed: 2, minimumValue: 0.1, sync: false }
+        },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#ffffff",
+          opacity: 0.4,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: "none",
+          random: false,
+          straight: false,
+          outMode: "out",
+          bounce: false,
+        }
+      },
+      interactivity: {
+        detectsOn: "canvas",
+        events: {
+          onHover: { enable: true, mode: "repulse" },
+          onClick: { enable: true, mode: "push" },
+          resize: true
+        },
+        modes: {
+          repulse: { distance: 100, duration: 0.4 },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
 
-  <div class="result" id="result" style="display:none;"></div>
-  <div class="tips" id="tips" style="display:none;"></div>
-</div>
+    // Initialize date and user
+    const currentDate = "2025-04-24 17:22:10";
+    const currentUser = "Kpavan63";
 
-<script>
-  let savedUnitCost = null;
+    function addRate(tabId) {
+      const rateInput = document.getElementById(`newRate${tabId}`);
+      const rate = parseFloat(rateInput.value);
+      
+      if (isNaN(rate) || rate <= 0) {
+        alert('Please enter a valid rate');
+        return;
+      }
 
-  window.onload = () => {
-    const stored = localStorage.getItem("unitCost");
-    if (stored) {
-      savedUnitCost = parseFloat(stored);
-      document.getElementById("unitDisplay").innerText = savedUnitCost.toFixed(2);
-      document.getElementById("unitInputSection").style.display = "none";
-      document.getElementById("unitCardSection").style.display = "block";
-    }
-  };
+      localStorage.setItem('electricityRate', rate);
+      localStorage.setItem('rateTimestamp', currentDate);
+      localStorage.setItem('rateUser', currentUser);
 
-  function addUnitCost() {
-    const unitValue = parseFloat(document.getElementById("unitCost").value);
-    if (isNaN(unitValue) || unitValue <= 0) {
-      alert("Please enter a valid cost per unit.");
-      return;
-    }
-
-    savedUnitCost = unitValue;
-    localStorage.setItem("unitCost", unitValue);
-    document.getElementById("unitDisplay").innerText = unitValue.toFixed(2);
-    document.getElementById("unitInputSection").style.display = "none";
-    document.getElementById("unitCardSection").style.display = "block";
-  }
-
-  function removeUnitCost() {
-    savedUnitCost = null;
-    localStorage.removeItem("unitCost");
-    document.getElementById("unitCost").value = '';
-    document.getElementById("unitInputSection").style.display = "block";
-    document.getElementById("unitCardSection").style.display = "none";
-    document.getElementById("result").style.display = "none";
-    document.getElementById("tips").style.display = "none";
-  }
-
-  function calculateBill() {
-    const prev = parseFloat(document.getElementById("prev").value);
-    const curr = parseFloat(document.getElementById("curr").value);
-
-    if (isNaN(prev) || isNaN(curr) || curr < prev) {
-      alert("Please enter valid meter readings.");
-      return;
-    }
-
-    if (savedUnitCost === null) {
-      alert("Please add the unit cost first.");
-      return;
-    }
-
-    const units = curr - prev;
-    const amount = units * savedUnitCost;
-
-    const result = `
-      🔌 Units Consumed: <strong>${units} kWh</strong><br>
-      💰 Total Amount: <strong>₹${amount.toFixed(2)}</strong>
-    `;
-    document.getElementById("result").innerHTML = result;
-    document.getElementById("result").style.display = "block";
-
-    // Show energy-saving tips
-    let tipText = "";
-    if (amount > 1000) {
-      tipText = "💡 Your bill is a bit high! Try using LED lights, turning off unused devices, and checking for energy leaks.";
-    } else if (amount > 500) {
-      tipText = "🔋 Consider reducing heavy appliance usage or using them in non-peak hours.";
-    } else {
-      tipText = "✅ Great job keeping your energy usage in check!";
+      updateStoredRateDisplay();
+      rateInput.value = '';
+      document.getElementById(`rateInputGroup${tabId}`).style.display = 'none';
     }
 
-    const tipsBox = document.getElementById("tips");
-    tipsBox.innerText = tipText;
-    tipsBox.style.display = "block";
-  }
-</script>
+    function updateStoredRateDisplay() {
+      const rate = localStorage.getItem('electricityRate');
+      if (rate) {
+        document.querySelectorAll('.stored-rate').forEach(el => {
+          el.style.display = 'block';
+          el.textContent = `Current Rate: ₹${rate}/unit`;
+        });
+        document.querySelectorAll('.rate-input-group').forEach(el => {
+          el.style.display = 'none';
+        });
+      }
+    }
 
+    function clearStoredData() {
+      localStorage.removeItem('electricityRate');
+      localStorage.removeItem('rateTimestamp');
+      localStorage.removeItem('rateUser');
+      
+      document.querySelectorAll('.rate-input-group').forEach(el => {
+        el.style.display = 'flex';
+      });
+      
+      document.querySelectorAll('.stored-rate').forEach(el => {
+        el.style.display = 'none';
+      });
+      
+      document.querySelectorAll('input').forEach(input => {
+        input.value = '';
+      });
+      
+      document.querySelectorAll('.result-box, .tips').forEach(el => {
+        el.style.display = 'none';
+      });
+    }
+
+    function switchTab(tab) {
+      document.getElementById('readingContent').style.display = tab === 'reading' ? 'block' : 'none';
+      document.getElementById('unitContent').style.display = tab === 'units' ? 'block' : 'none';
+      document.getElementById('readingTab').classList.toggle('active', tab === 'reading');
+      document.getElementById('unitTab').classList.toggle('active', tab === 'units');
+    }
+
+    function calculateFromReadings() {
+      const prev = parseFloat(document.getElementById('prevReading').value);
+      const curr = parseFloat(document.getElementById('currReading').value);
+      const rate = localStorage.getItem('electricityRate');
+
+      if (!rate) {
+        alert('Please set the rate first');
+        return;
+      }
+
+      if (isNaN(prev) || isNaN(curr) || curr < prev) {
+        alert('Please enter valid readings');
+        return;
+      }
+
+      const units = curr - prev;
+      const total = units * parseFloat(rate);
+      
+      document.getElementById('resultReading').innerHTML = `
+        <div style="font-size: 18px; margin-bottom: 10px; color: white;">Bill Summary</div>
+        <div style="font-size: 24px; color: white; margin-bottom: 5px;">₹${total.toFixed(2)}</div>
+        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7);">Total Units: ${units} kWh</div>
+      `;
+      document.getElementById('resultReading').style.display = 'block';
+      showTips(total, 'tipReading');
+    }
+
+    function calculateFromUnits() {
+      const units = parseFloat(document.getElementById('units').value);
+      const rate = localStorage.getItem('electricityRate');
+
+      if (!rate) {
+        alert('Please set the rate first');
+        return;
+      }
+
+      if (isNaN(units) || units <= 0) {
+        alert('Please enter valid units');
+        return;
+      }
+
+      const total = units * parseFloat(rate);
+      
+      document.getElementById('resultUnits').innerHTML = `
+        <div style="font-size: 18px; margin-bottom: 10px; color: white;">Bill Summary</div>
+        <div style="font-size: 24px; color: white; margin-bottom: 5px;">₹${total.toFixed(2)}</div>
+        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7);">Total Units: ${units} kWh</div>
+      `;
+      document.getElementById('resultUnits').style.display = 'block';
+      showTips(total, 'tipUnits');
+    }
+
+    function showTips(amount, tipId) {
+      let tip = '';
+      let icon = '';
+      if (amount > 1000) {
+        icon = '⚠️';
+        tip = 'High consumption detected! Consider these energy-saving tips:\n• Use LED bulbs\n• Optimize AC temperature\n• Unplug idle devices';
+      } else if (amount > 500) {
+        icon = '⚡';
+        tip = 'Moderate usage. Here are some tips to reduce further:\n• Use natural light when possible\n• Service appliances regularly\n• Use power strips';
+      } else {
+        icon = '🌟';
+        tip = 'Great job! Your consumption is low. Keep up these good habits:\n• Continue using energy-efficient appliances\n• Maintain current usage patterns';
+      }
+      document.getElementById(tipId).innerHTML = `${icon} ${tip}`;
+      document.getElementById(tipId).style.display = 'block';
+    }
+
+    // Initialize on page load
+    window.onload = function() {
+      updateStoredRateDisplay();
+    }
+  </script>
 </body>
 </html>
